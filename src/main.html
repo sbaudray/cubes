@@ -1,0 +1,72 @@
+<head>
+  <title>Tech test</title>
+  <link rel="stylesheet" type="text/css" href="https://www.x3dom.org/download/x3dom.css">
+  <script type="text/javascript" src="https://www.x3dom.org/download/x3dom.js"></script>
+  <script>
+    // patch x3dom to throw a real bubbling event with
+    // a real currentTarget
+    x3dom.Viewarea.prototype.callEvtHandler = function (node, eventType, event) {
+      if (!node || !node._xmlNode) {
+        return null;
+      }
+
+      event.target = node._xmlNode;
+      var attrib = node._xmlNode[eventType];
+
+      try {
+        // XXX keep events as attributes?
+        if (typeof (attrib) === "function") {
+          attrib.call(node._xmlNode, event);
+        } else {
+          var funcStr = node._xmlNode.getAttribute(eventType);
+          // yikes, eval
+          var func = new Function('event', funcStr);
+          func.call(node._xmlNode, event);
+        }
+
+        var listeners = node._listeners[event.type];
+        if (listeners) {
+          _.each(listeners, function (listener) {
+            listener.call(node._xmlNode, event);
+          });
+        }
+      } catch (e) {
+        x3dom.debug.logException(e);
+      }
+
+      var jqEvent = jQuery.Event(eventType, event);
+      $(node._xmlNode).trigger(jqEvent);
+      return true;
+    };
+  </script>
+</head>
+
+<body>
+  {{> world}}
+</body>
+
+<template name="world">
+  <x3d id="x3d">
+    <scene>
+      <!-- Floor -->
+      <transform>
+        <shape>
+          <appearance>
+            <material diffuseColor="#4A9"></material>
+          </appearance>
+          <plane center='0,0,-0.5' size="50 50"></plane>
+        </shape>
+      </transform>
+
+      <!-- Cube -->
+      <transform translation="0 0 0">
+        <shape>
+          <appearance>
+            <material diffuseColor="1 0 0"></material>
+          </appearance>
+          <box size="1 1 1"></box>
+        </shape>
+      </transform>
+    </scene>
+  </x3d>
+</template>
