@@ -1,7 +1,14 @@
 <head>
   <title>Tech test</title>
-  <link rel="stylesheet" type="text/css" href="https://www.x3dom.org/download/x3dom.css">
-  <script type="text/javascript" src="https://www.x3dom.org/download/x3dom.js"></script>
+  <link
+    rel="stylesheet"
+    type="text/css"
+    href="https://www.x3dom.org/download/x3dom.css"
+  />
+  <script
+    type="text/javascript"
+    src="https://www.x3dom.org/download/x3dom.js"
+  ></script>
   <script type="text/javascript" src="/x3dom-patch.js"></script>
 </head>
 
@@ -11,26 +18,30 @@
 
 <template name="world">
   <x3d>
-    <scene>
+    <scene id="scene">
       <!-- Floor -->
       <transform>
         <shape>
           <appearance>
             <material diffuseColor="#4A9"></material>
           </appearance>
-          <plane center='0,0,-0.5' size="50 50"></plane>
+          <plane center="0,0,-0.5" size="50 50"></plane>
         </shape>
       </transform>
 
       <!-- Cube -->
-      <transform translation="0 0 0">
+      {{#each cubes}}
+      <transform translation="{{ x }} {{ y }} 0">
         <shape>
           <appearance>
-            <material diffuseColor="1 0 0"></material>
+            <material
+              diffuseColor="{{ colorRGB.r}} {{ colorRGB.g}} {{ colorRGB.b}}"
+            ></material>
           </appearance>
           <box size="1 1 1"></box>
         </shape>
       </transform>
+      {{/each}}
     </scene>
   </x3d>
 </template>
